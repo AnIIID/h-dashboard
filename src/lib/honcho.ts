@@ -68,12 +68,13 @@ export function getPeerCard(peerId: string, workspaceId = "default") {
   return get(`/v3/workspaces/${workspaceId}/peers/${peerId}/card`);
 }
 
-export function getPeerRepresentation(peerId: string, workspaceId = "default") {
-  return get(`/v3/workspaces/${workspaceId}/peers/${peerId}/representation`);
+export async function getPeerRepresentation(peerId: string, workspaceId = "default") {
+  const data = await post(`/v3/workspaces/${workspaceId}/peers/${peerId}/representation`, { peer_id: peerId });
+  return data.representation ?? null;
 }
 
 export function getPeerConclusions(peerId: string, workspaceId = "default") {
-  return listItems(`/v3/workspaces/${workspaceId}/peers/${peerId}/conclusions/list`);
+  return listItems(`/v3/workspaces/${workspaceId}/conclusions/list`, { observer_id: peerId });
 }
 
 // Dream
