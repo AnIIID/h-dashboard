@@ -1,8 +1,22 @@
-import { listPeers, getPeerConclusions, getPeerRepresentation, getPeerCard } from "@/lib/honcho";
+import {
+  listPeers,
+  getPeerConclusions,
+  getPeerRepresentation,
+  getPeerCard,
+} from "@/lib/honcho";
+import {
+  fetchAllMessages,
+  getConclusionTypeCounts,
+  getPeerStats,
+} from "@/lib/analytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import DreamButton from "@/components/DreamButton";
+import {
+  ConclusionDonut,
+  PeerComparisonBar,
+} from "@/components/charts/MemoryCharts";
 
 export const dynamic = "force-dynamic";
 
@@ -10,26 +24,49 @@ export default async function MemoryPage() {
   const peers = await listPeers().catch(() => []);
   const peerList = Array.isArray(peers) ? peers : [];
 
-  const peerData = await Promise.all(
-    peerList.map(async (p: { id: string }) => {
-      const [conclusions, representation, card] = await Promise.all([
-        getPeerConclusions(p.id).catch(() => []),
-        getPeerRepresentation(p.id).catch(() => null),
-        getPeerCard(p.id).catch(() => null),
-      ]);
-      return {
-        id: p.id,
-        conclusions: Array.isArray(conclusions) ? conclusions : [],
-        representation,
-        card,
-      };
-    })
-  );
+  // Parallel: Peer-Details, Conclusion-Types, Messages+PeerStats
+  const [peerData, conclusionTypes, allMsgData] = await Promise.all([
+    Promise.all(
+      peerList.map(async (p: { id: string }) => {
+        const [conclusions, representation, card] = await Promise.all([
+          getPeerConclusions(p.id).catch(() => []),
+          getPeerRepresentation(p.id).catch(() => null),
+          getPeerCard(p.id).catch(() => null),
+        ]);
+        return {
+          id: p.id,
+          conclusions: Array.isArray(conclusions) ? conclusions : [],
+          representation,
+          card,
+        };
+      })
+    ),
+    getConclusionTypeCounts().catch(() => []),
+    fetchAllMessages().catch(() => ({ sessions: [], messages: [] })),
+  ]);
+
+  const peerStats = await getPeerStats(
+    allMsgData.sessions,
+    allMsgData.messages
+  ).catch(() => []);
 
   const totalConclusions = peerData.reduce(
     (sum, p) => sum + p.conclusions.length,
     0
   );
+
+  // Hilfsfunktion: Peer-Card/Representation-Objekt lesbar anzeigen
+  function formatContent(value: unknown): string {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    if (typeof value === "object") {
+      // Versuche relevante Felder zu extrahieren
+      const obj = value as Record<string, unknown>;
+      if (obj.content && typeof obj.content === "string") return obj.content;
+      return JSON.stringify(value, null, 2);
+    }
+    return String(value);
+  }
 
   return (
     <div className="space-y-6">
@@ -40,42 +77,41 @@ export default async function MemoryPage() {
         </p>
       </div>
 
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Peers tracked
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold font-mono">{peerData.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total conclusions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold font-mono">{totalConclusions}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Representations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold font-mono">
-              {peerData.filter((p) => p.representation).length}
-            </p>
-          </CardContent>
-        </Card>
+        {[
+          { label: "Peers tracked", value: peerData.length },
+          { label: "Total conclusions", value: totalConclusions },
+          {
+            label: "Representations",
+            value: peerData.filter((p) => p.representation).length,
+          },
+        ].map(({ label, value }) => (
+          <Card key={label}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold font-mono">{value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ConclusionDonut data={conclusionTypes} />
+        <PeerComparisonBar data={peerStats} />
       </div>
 
       <Separator />
+
+      {/* Peer Sections */}
+      {peerData.length === 0 && (
+        <p className="text-sm text-muted-foreground">Keine Peers vorhanden.</p>
+      )}
 
       {peerData.map((peer) => (
         <div key={peer.id} className="space-y-4">
@@ -87,25 +123,23 @@ export default async function MemoryPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Peer Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">
-                  Peer Card
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Peer Card</CardTitle>
               </CardHeader>
               <CardContent>
                 {peer.card ? (
-                  <pre className="text-sm font-mono whitespace-pre-wrap">
-                    {typeof peer.card === "string"
-                      ? peer.card
-                      : JSON.stringify(peer.card, null, 2)}
-                  </pre>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                    {formatContent(peer.card)}
+                  </p>
                 ) : (
-                  <p className="text-muted-foreground text-sm">Empty</p>
+                  <p className="text-muted-foreground text-sm">Leer</p>
                 )}
               </CardContent>
             </Card>
 
+            {/* Representation */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm font-medium">
@@ -114,38 +148,47 @@ export default async function MemoryPage() {
               </CardHeader>
               <CardContent>
                 {peer.representation ? (
-                  <pre className="text-sm font-mono whitespace-pre-wrap">
-                    {typeof peer.representation === "string"
-                      ? peer.representation
-                      : JSON.stringify(peer.representation, null, 2)}
-                  </pre>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                    {formatContent(peer.representation)}
+                  </p>
                 ) : (
-                  <p className="text-muted-foreground text-sm">Empty</p>
+                  <p className="text-muted-foreground text-sm">Leer</p>
                 )}
               </CardContent>
             </Card>
           </div>
 
+          {/* Conclusions */}
           {peer.conclusions.length > 0 && (
             <div className="space-y-2">
               <h4 className="text-sm font-medium text-muted-foreground">
                 Conclusions ({peer.conclusions.length})
               </h4>
-              {peer.conclusions.map(
-                (c: { id: string; content: string; type?: string }) => (
-                  <Card key={c.id}>
-                    <CardContent className="pt-4">
-                      <p className="text-sm">{c.content}</p>
-                      {c.type && (
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {c.type}
-                        </span>
-                      )}
-                    </CardContent>
-                  </Card>
-                )
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {peer.conclusions.map(
+                  (c: { id: string; content: string; type?: string }) => (
+                    <Card key={c.id}>
+                      <CardContent className="pt-4 pb-3">
+                        <div className="flex items-start gap-2">
+                          {c.type && (
+                            <Badge variant="outline" className="shrink-0 mt-0.5">
+                              {c.type}
+                            </Badge>
+                          )}
+                          <p className="text-sm leading-relaxed">{c.content}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                )}
+              </div>
             </div>
+          )}
+
+          {peer.conclusions.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              Keine Conclusions vorhanden.
+            </p>
           )}
 
           <Separator />
