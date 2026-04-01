@@ -13,7 +13,7 @@ Honcho Dashboard — Web-UI zur Verwaltung von Sessions, Peers, Memory und Pipel
 - **Next.js 16.2.1** (App Router, Turbopack, standalone output)
 - **React 19.2.4**, TypeScript
 - **next-auth v5 beta** (Credentials Provider, JWT sessions)
-- **@honcho-ai/sdk** — API-Client zum Honcho-Backend
+- **Recharts 3** — Chart-Library für Visualisierungen
 - **UI**: shadcn/ui, Tailwind CSS 4, Lucide Icons
 
 ## Next.js 16 — Wichtige Abweichungen
@@ -39,15 +39,25 @@ src/
       pipeline/         # Pipeline-Ansicht
     api/auth/[...nextauth]/  # NextAuth Route Handler
     api/honcho/              # Proxy-Routes zum Honcho-Backend
+      dream/               # Dream-Trigger
+      peers/[id]/          # Peer-Detail + Conclusions
+      queue/               # Queue-Status
+      sessions/[id]/       # Session-Messages
+      settings/            # Workspace-Settings
+      workspace/           # Workspace-Metadata
     login/                   # Login-Seite (ungeschützt)
   lib/
     auth.ts             # NextAuth-Config (Credentials, JWT)
-    honcho.ts           # Honcho SDK Client
+    honcho.ts           # Honcho API-Client (plain fetch)
+    analytics.ts        # Daten-Aggregation für Charts
+    utils.ts            # cn()-Helper
   middleware.ts         # Auth-Middleware (schützt alles ausser /login, /api/auth)
   components/
     Providers.tsx       # SessionProvider (basePath: /api/auth)
+    DreamButton.tsx     # Dream-Trigger Button
     layout/             # Header, Sidebar
-    ui/                 # shadcn/ui Komponenten
+    charts/             # OverviewCharts, MemoryCharts, ActivityHeatmap
+    ui/                 # shadcn/ui Komponenten (13 Stück)
 ```
 
 ## Auth-Flow

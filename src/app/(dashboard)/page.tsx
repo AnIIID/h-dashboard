@@ -11,6 +11,7 @@ import {
   TokensByPeerChart,
   HourlyActivityChart,
 } from "@/components/charts/OverviewCharts";
+import { ActivityHeatmap } from "@/components/charts/ActivityHeatmap";
 import { MessageSquare, Users, Layers, Clock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -68,6 +69,9 @@ export default async function OverviewPage() {
 
       {/* Activity Timeline — volle Breite */}
       <ActivityTimeline data={dayData} />
+
+      {/* Aktivitäts-Heatmap — volle Breite */}
+      <ActivityHeatmap data={dayData} />
 
       {/* Token by Peer (2/3) + Hourly Activity (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

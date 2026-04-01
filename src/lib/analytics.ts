@@ -153,6 +153,41 @@ export async function getPeerStats(
   });
 }
 
+/** Kumulative Wachstumskurve: Conclusions über Zeit */
+export type ConclusionGrowthPoint = { date: string; total: number };
+
+export async function aggregateConclusionGrowth(): Promise<ConclusionGrowthPoint[]> {
+  const peers = await listPeers();
+  const conclusionArrays = await Promise.all(
+    peers.map((p: { id: string }) => getPeerConclusions(p.id).catch(() => []))
+  );
+
+  // Alle Conclusions mit created_at sammeln
+  const dates: string[] = [];
+  for (const conclusions of conclusionArrays) {
+    for (const c of conclusions ?? []) {
+      const created = (c as Record<string, unknown>).created_at as string | undefined;
+      if (created) dates.push(created.slice(0, 10));
+    }
+  }
+
+  if (!dates.length) return [];
+
+  // Pro Tag zählen
+  const countByDay: Record<string, number> = {};
+  for (const d of dates) {
+    countByDay[d] = (countByDay[d] || 0) + 1;
+  }
+
+  // Sortieren und kumulieren
+  const sorted = Object.entries(countByDay).sort(([a], [b]) => a.localeCompare(b));
+  let cumulative = 0;
+  return sorted.map(([date, count]) => {
+    cumulative += count;
+    return { date, total: cumulative };
+  });
+}
+
 /** Queue status */
 export async function getQueueStats() {
   return getQueueStatus();

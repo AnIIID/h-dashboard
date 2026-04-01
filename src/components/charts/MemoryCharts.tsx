@@ -6,6 +6,8 @@ import {
   Cell,
   BarChart,
   Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -144,6 +146,86 @@ export function PeerComparisonBar({ data }: { data: PeerStatsData[] }) {
             <Bar dataKey="messages" fill="var(--color-messages)" radius={[4, 4, 0, 0]} />
             <Bar dataKey="conclusions" fill="var(--color-conclusions)" radius={[4, 4, 0, 0]} />
           </BarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ── Area Chart: Memory-Wachstumskurve ───────────────────
+
+type ConclusionGrowthData = { date: string; total: number };
+
+const growthConfig: ChartConfig = {
+  total: { label: "Gesamte Conclusions", color: "var(--chart-4)" },
+};
+
+export function ConclusionGrowthChart({ data }: { data: ConclusionGrowthData[] }) {
+  if (!data.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">
+            Gedächtnis-Wachstum
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Keine Daten</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium">Gedächtnis-Wachstum</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={growthConfig} className="aspect-video max-h-[300px]">
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--color-total)" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="var(--color-total)" stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              axisLine={false}
+              fontSize={12}
+              tickFormatter={(v: string) => {
+                const [, m, d] = v.split("-");
+                return `${d}.${m}.`;
+              }}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              fontSize={12}
+              allowDecimals={false}
+            />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(v) => {
+                    const s = String(v);
+                    const [y, m, d] = s.split("-");
+                    return `${d}.${m}.${y}`;
+                  }}
+                />
+              }
+            />
+            <Area
+              type="monotone"
+              dataKey="total"
+              stroke="var(--color-total)"
+              strokeWidth={2}
+              fill="url(#growthFill)"
+            />
+          </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>

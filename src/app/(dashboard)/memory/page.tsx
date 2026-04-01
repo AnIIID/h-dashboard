@@ -8,6 +8,7 @@ import {
   fetchAllMessages,
   getConclusionTypeCounts,
   getPeerStats,
+  aggregateConclusionGrowth,
 } from "@/lib/analytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ import DreamButton from "@/components/DreamButton";
 import {
   ConclusionDonut,
   PeerComparisonBar,
+  ConclusionGrowthChart,
 } from "@/components/charts/MemoryCharts";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +27,7 @@ export default async function MemoryPage() {
   const peerList = Array.isArray(peers) ? peers : [];
 
   // Parallel: Peer-Details, Conclusion-Types, Messages+PeerStats
-  const [peerData, conclusionTypes, allMsgData] = await Promise.all([
+  const [peerData, conclusionTypes, allMsgData, growthData] = await Promise.all([
     Promise.all(
       peerList.map(async (p: { id: string }) => {
         const [conclusions, representation, card] = await Promise.all([
@@ -43,6 +45,7 @@ export default async function MemoryPage() {
     ),
     getConclusionTypeCounts().catch(() => []),
     fetchAllMessages().catch(() => ({ sessions: [], messages: [] })),
+    aggregateConclusionGrowth().catch(() => []),
   ]);
 
   const peerStats = await getPeerStats(
@@ -105,6 +108,9 @@ export default async function MemoryPage() {
         <ConclusionDonut data={conclusionTypes} />
         <PeerComparisonBar data={peerStats} />
       </div>
+
+      {/* Wachstumskurve — volle Breite */}
+      <ConclusionGrowthChart data={growthData} />
 
       <Separator />
 
