@@ -23,14 +23,20 @@ function get(path: string) {
   return api(path);
 }
 
+// Paginated list endpoints return {items: [...], total, page, size, pages}
+async function listItems(path: string, body: Record<string, unknown> = {}) {
+  const data = await post(path, body);
+  return data.items ?? data;
+}
+
 // Workspace
 export function listWorkspaces() {
-  return post("/v3/workspaces/list");
+  return listItems("/v3/workspaces/list");
 }
 
 // Sessions
 export function listSessions(workspaceId = "default") {
-  return post(`/v3/workspaces/${workspaceId}/sessions/list`);
+  return listItems(`/v3/workspaces/${workspaceId}/sessions/list`);
 }
 
 export function getSession(sessionId: string, workspaceId = "default") {
@@ -38,11 +44,11 @@ export function getSession(sessionId: string, workspaceId = "default") {
 }
 
 export function getSessionMessages(sessionId: string, workspaceId = "default") {
-  return post(`/v3/workspaces/${workspaceId}/sessions/${sessionId}/messages/list`);
+  return listItems(`/v3/workspaces/${workspaceId}/sessions/${sessionId}/messages/list`);
 }
 
-export function getSessionPeers(sessionId: string, workspaceId = "default") {
-  return post(`/v3/workspaces/${workspaceId}/sessions/${sessionId}/peers/list`);
+export function getSessionDetail(sessionId: string, workspaceId = "default") {
+  return post(`/v3/workspaces/${workspaceId}/sessions/${sessionId}/peers`);
 }
 
 export function getSessionContext(sessionId: string, workspaceId = "default") {
@@ -51,7 +57,7 @@ export function getSessionContext(sessionId: string, workspaceId = "default") {
 
 // Peers
 export function listPeers(workspaceId = "default") {
-  return post(`/v3/workspaces/${workspaceId}/peers/list`);
+  return listItems(`/v3/workspaces/${workspaceId}/peers/list`);
 }
 
 export function getPeer(peerId: string, workspaceId = "default") {
@@ -67,7 +73,7 @@ export function getPeerRepresentation(peerId: string, workspaceId = "default") {
 }
 
 export function getPeerConclusions(peerId: string, workspaceId = "default") {
-  return post(`/v3/workspaces/${workspaceId}/peers/${peerId}/conclusions/list`);
+  return listItems(`/v3/workspaces/${workspaceId}/peers/${peerId}/conclusions/list`);
 }
 
 // Queue

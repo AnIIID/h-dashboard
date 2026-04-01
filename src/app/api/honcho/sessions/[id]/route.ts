@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionMessages, getSessionPeers } from "@/lib/honcho";
+import { getSessionMessages } from "@/lib/honcho";
 
 export async function GET(
   _req: NextRequest,
@@ -7,11 +7,8 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
-    const [messages, peers] = await Promise.all([
-      getSessionMessages(id),
-      getSessionPeers(id),
-    ]);
-    return NextResponse.json({ id, messages, peers });
+    const messages = await getSessionMessages(id);
+    return NextResponse.json({ id, messages });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 502 });
   }

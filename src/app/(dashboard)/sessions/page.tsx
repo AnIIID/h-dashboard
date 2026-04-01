@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listSessions, getSessionPeers, getSessionMessages } from "@/lib/honcho";
+import { listSessions, getSessionMessages } from "@/lib/honcho";
 import {
   Table,
   TableBody,
@@ -12,20 +12,30 @@ import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
+interface Message {
+  id: string;
+  content: string;
+  peer_id?: string;
+  created_at?: string;
+}
+
+interface Session {
+  id: string;
+  is_active?: boolean;
+  created_at?: string;
+}
+
 export default async function SessionsPage() {
-  const sessions = await listSessions().catch(() => []);
-  const list = Array.isArray(sessions) ? sessions : [];
+  const sessions: Session[] = await listSessions().catch(() => []);
 
   const enriched = await Promise.all(
-    list.map(async (s: { id: string }) => {
-      const [peers, messages] = await Promise.all([
-        getSessionPeers(s.id).catch(() => []),
-        getSessionMessages(s.id).catch(() => []),
-      ]);
+    sessions.map(async (s) => {
+      const messages: Message[] = await getSessionMessages(s.id).catch(() => []);
+      const peers = [...new Set(messages.map((m) => m.peer_id).filter(Boolean))];
       return {
-        id: s.id,
-        peers: Array.isArray(peers) ? peers : [],
-        messageCount: Array.isArray(messages) ? messages.length : 0,
+        ...s,
+        peers,
+        messageCount: messages.length,
       };
     })
   );
@@ -41,6 +51,7 @@ export default async function SessionsPage() {
             <TableRow>
               <TableHead>Session ID</TableHead>
               <TableHead>Peers</TableHead>
+              <TableHead>Created</TableHead>
               <TableHead className="text-right">Messages</TableHead>
             </TableRow>
           </TableHeader>
@@ -56,7 +67,7 @@ export default async function SessionsPage() {
                   </Link>
                 </TableCell>
                 <TableCell className="space-x-1">
-                  {s.peers.map((p: string) => (
+                  {s.peers.map((p) => (
                     <Badge key={p} variant="secondary">
                       {p}
                     </Badge>
@@ -64,6 +75,11 @@ export default async function SessionsPage() {
                   {s.peers.length === 0 && (
                     <span className="text-muted-foreground text-sm">—</span>
                   )}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {s.created_at
+                    ? new Date(s.created_at).toLocaleString("de-DE")
+                    : "—"}
                 </TableCell>
                 <TableCell className="text-right font-mono">
                   {s.messageCount}
