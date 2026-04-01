@@ -46,13 +46,13 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-gray-300">
-              E-Mail
+              Benutzer
             </label>
             <Input
               id="email"
               name="email"
-              type="email"
-              placeholder="mail@example.com"
+              type="text"
+              placeholder="Benutzername"
               required
               autoFocus
               className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
