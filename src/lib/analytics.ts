@@ -31,8 +31,8 @@ export async function fetchAllMessages() {
   return {
     sessions,
     messages: messageArrays.flatMap((msgs: unknown[], i: number) =>
-      (msgs ?? []).map((m: Record<string, unknown>) => ({
-        ...m,
+      (msgs ?? []).map((m: unknown) => ({
+        ...(m as Record<string, unknown>),
         session_id: sessions[i].id,
       }))
     ),
