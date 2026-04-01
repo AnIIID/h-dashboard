@@ -2,6 +2,12 @@
 
 Honcho Dashboard — Web-UI zur Verwaltung von Sessions, Peers, Memory und Pipeline der Honcho-Plattform.
 
+## Encoding
+
+- IMMER echte UTF-8 Zeichen verwenden: ä ö ü ß é — NIEMALS Unicode-Escapes (`\u00e4`, `\u00fc` etc.)
+- Gilt für Code, Strings, Kommentare, Commit-Messages, Doku, Memory-Files
+- Dateien sind UTF-8 (siehe `.editorconfig`)
+
 ## Tech-Stack
 
 - **Next.js 16.2.1** (App Router, Turbopack, standalone output)
