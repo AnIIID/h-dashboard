@@ -1,6 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const pageNames: Record<string, string> = {
   "/": "Overview",
@@ -23,6 +26,14 @@ export function Header() {
           A
         </div>
         <span className="text-sm text-gray-600">Admin</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
       </div>
     </header>
   );

@@ -5,15 +5,19 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        username: { label: "Username" },
-        password: { label: "Password" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       authorize(credentials) {
         if (
-          credentials?.username === process.env.ADMIN_USER &&
-          credentials?.password === process.env.ADMIN_PASSWORD
+          credentials?.email === process.env.DASHBOARD_USER &&
+          credentials?.password === process.env.DASHBOARD_PASSWORD
         ) {
-          return { id: "1", name: credentials.username as string };
+          return {
+            id: "1",
+            name: "Admin",
+            email: credentials.email as string,
+          };
         }
         return null;
       },
@@ -24,4 +28,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     signIn: "/login",
   },
   session: { strategy: "jwt" },
+  callbacks: {
+    authorized({ auth: session }) {
+      return !!session?.user;
+    },
+  },
 });
