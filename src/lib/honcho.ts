@@ -76,6 +76,19 @@ export function getPeerConclusions(peerId: string, workspaceId = "default") {
   return listItems(`/v3/workspaces/${workspaceId}/peers/${peerId}/conclusions/list`);
 }
 
+// Dream
+export function scheduleDream(
+  peerId: string,
+  workspaceId = "default",
+  sessionId?: string,
+  targetPeerId?: string
+) {
+  const body: Record<string, unknown> = {};
+  if (sessionId) body.session_id = sessionId;
+  if (targetPeerId) body.target_peer_id = targetPeerId;
+  return post(`/v3/workspaces/${workspaceId}/peers/${peerId}/dream`, body);
+}
+
 // Queue
 export function getQueueStatus() {
   return get("/v3/queue/status");
