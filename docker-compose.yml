@@ -8,8 +8,8 @@ services:
     environment:
       - HONCHO_BASE_URL=http://honcho-api-1:8000
       - AUTH_SECRET=${AUTH_SECRET}
-      - ADMIN_USER=${ADMIN_USER}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DASHBOARD_USER=${DASHBOARD_USER}
+      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD}
     networks:
       - honcho_default
 
