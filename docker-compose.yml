@@ -1,0 +1,18 @@
+services:
+  h-dashboard:
+    build: .
+    container_name: h-dashboard
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3100:3000"
+    environment:
+      - HONCHO_BASE_URL=http://honcho-api-1:8000
+      - AUTH_SECRET=${AUTH_SECRET}
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    networks:
+      - honcho_default
+
+networks:
+  honcho_default:
+    external: true
