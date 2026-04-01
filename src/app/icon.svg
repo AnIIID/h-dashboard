@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <!-- Left hemisphere -->
+  <path d="M16 4C12.5 4 10 5.5 9 7.5C7.5 7 5.5 8 5 10.5C4 11.5 3.5 13.5 4 15.5C3.5 17 3.5 19 5 21C5 23 6.5 25 9 26C10.5 27.5 13 28 16 28" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Right hemisphere -->
+  <path d="M16 4C19.5 4 22 5.5 23 7.5C24.5 7 26.5 8 27 10.5C28 11.5 28.5 13.5 28 15.5C28.5 17 28.5 19 27 21C27 23 25.5 25 23 26C21.5 27.5 19 28 16 28" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Central fissure -->
+  <path d="M16 4V28" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Left folds -->
+  <path d="M16 10C13 10 10 11 8 13" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M16 17C13 17 9 17 6 19" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Right folds -->
+  <path d="M16 10C19 10 22 11 24 13" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M16 17C19 17 23 17 26 19" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Brain stem -->
+  <path d="M14 28C14 29.5 15 30 16 30C17 30 18 29.5 18 28" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
