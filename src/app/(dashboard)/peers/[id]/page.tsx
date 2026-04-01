@@ -5,6 +5,7 @@ import {
 } from "@/lib/honcho";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import DreamButton from "@/components/DreamButton";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,12 @@ export default async function PeerDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Peer</h2>
-        <p className="font-mono text-sm text-muted-foreground mt-1">{id}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Peer</h2>
+          <p className="font-mono text-sm text-muted-foreground mt-1">{id}</p>
+        </div>
+        <DreamButton peerId={id} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

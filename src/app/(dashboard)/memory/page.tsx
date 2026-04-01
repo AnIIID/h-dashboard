@@ -2,6 +2,7 @@ import { listPeers, getPeerConclusions, getPeerRepresentation, getPeerCard } fro
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import DreamButton from "@/components/DreamButton";
 
 export const dynamic = "force-dynamic";
 
@@ -78,9 +79,12 @@ export default async function MemoryPage() {
 
       {peerData.map((peer) => (
         <div key={peer.id} className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Badge variant="secondary">{peer.id}</Badge>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Badge variant="secondary">{peer.id}</Badge>
+            </h3>
+            <DreamButton peerId={peer.id} />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card>
