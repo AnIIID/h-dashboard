@@ -10,8 +10,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       },
       authorize(credentials) {
         if (
-          credentials?.email === process.env.DASHBOARD_USER &&
-          credentials?.password === process.env.DASHBOARD_PASSWORD
+          credentials?.email === process.env.ADMIN_USER &&
+          credentials?.password === process.env.ADMIN_PASSWORD
         ) {
           return {
             id: "1",
@@ -25,7 +25,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ],
   basePath: "/dashboard/api/auth",
   pages: {
-    signIn: "/login",
+    signIn: "/dashboard/login",
   },
   session: { strategy: "jwt" },
   callbacks: {
