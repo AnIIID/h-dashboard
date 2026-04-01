@@ -39,16 +39,16 @@ src/
     honcho.ts           # Honcho SDK Client
   middleware.ts         # Auth-Middleware (schützt alles ausser /login, /api/auth)
   components/
-    Providers.tsx       # SessionProvider (basePath: /dashboard/api/auth)
+    Providers.tsx       # SessionProvider (basePath: /api/auth)
     layout/             # Header, Sidebar
     ui/                 # shadcn/ui Komponenten
 ```
 
 ## Auth-Flow
 
-- **basePath** in `next.config.ts`: `/dashboard`
-- **Auth basePath** in `auth.ts`: `/api/auth` (intern, Next.js strippt `/dashboard`)
-- **SessionProvider basePath**: `/dashboard/api/auth` (browser-seitig, voller Pfad)
+- **Kein basePath** — App läuft direkt auf `brain.andre-dueck.de/`
+- **Auth basePath** in `auth.ts`: `/api/auth`
+- **SessionProvider basePath**: `/api/auth`
 - **Credentials**: `ADMIN_USER` / `ADMIN_PASSWORD` aus Env-Vars
 - **Middleware**: Exportiert `auth` als middleware, schützt alle Routes ausser Login/Auth/Static
 
@@ -57,7 +57,8 @@ src/
 - **Server**: `root@91.99.134.32` (cax11 ARM, SSH Key Auth)
 - **App-Dir**: `/opt/h-dashboard/`
 - **Docker**: Container `h-dashboard`, Port `127.0.0.1:3100 -> 3000`
-- **Reverse Proxy**: Caddy, `brain.andre-dueck.de/dashboard` -> `h-dashboard:3000`
+- **Reverse Proxy**: Caddy, `brain.andre-dueck.de` catch-all → `h-dashboard:3000`
+- **Caddy-Routing**: `/v3*` → Honcho-API (Basic Auth), `/mcp*` → MCP, Rest → Dashboard
 - **Netzwerk**: `honcho_default` (shared mit honcho-api-1:8000)
 
 ### Deploy-Befehl
@@ -77,6 +78,7 @@ AUTH_SECRET=<generiert>
 ### Bekannte Fallstricke
 - `ADMIN_PASSWORD` mit `#` muss in `.env` gequotet sein
 - `.dockerignore` schliesst `.env` aus — Env-Vars kommen nur via docker-compose
-- `NEXTAUTH_URL` NICHT setzen — `AUTH_TRUST_HOST=true` reicht, sonst `env-url-basepath-mismatch`
-- Auth `basePath` in `auth.ts` ist `/api/auth` (NICHT `/dashboard/api/auth`)
-- `pages.signIn` in `auth.ts` ist `/login` (NICHT `/dashboard/login`)
+- `AUTH_URL` und `NEXTAUTH_URL` NICHT setzen — `AUTH_TRUST_HOST=true` reicht
+- Auth `basePath` in `auth.ts` ist `/api/auth`
+- `pages.signIn` in `auth.ts` ist `/login`
+- Caddy-Config liegt in `/opt/BusinessOS/Caddyfile` (businessos-caddy-1 Container)

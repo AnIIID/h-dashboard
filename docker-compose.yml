@@ -9,7 +9,6 @@ services:
       - HONCHO_BASE_URL=http://honcho-api-1:8000
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_TRUST_HOST=true
-      - AUTH_URL=https://brain.andre-dueck.de
       - ADMIN_USER=${ADMIN_USER}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     networks:

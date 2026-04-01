@@ -29,7 +29,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => signOut({ callbackUrl: "/dashboard/login" })}
+          onClick={() => signOut({ callbackUrl: "/login" })}
           className="text-gray-500 hover:text-gray-700"
         >
           <LogOut className="h-4 w-4" />
