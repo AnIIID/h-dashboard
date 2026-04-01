@@ -23,9 +23,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       },
     }),
   ],
-  basePath: "/dashboard/api/auth",
+  basePath: "/api/auth",
   pages: {
-    signIn: "/dashboard/login",
+    signIn: "/login",
   },
   session: { strategy: "jwt" },
   callbacks: {
