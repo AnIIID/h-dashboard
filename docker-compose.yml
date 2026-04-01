@@ -8,6 +8,7 @@ services:
     environment:
       - HONCHO_BASE_URL=http://honcho-api-1:8000
       - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_TRUST_HOST=true
       - ADMIN_USER=${ADMIN_USER}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     networks:
