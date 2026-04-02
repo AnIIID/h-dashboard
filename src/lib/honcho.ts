@@ -90,6 +90,16 @@ export function scheduleDream(
   return post(`/v3/workspaces/${workspaceId}/peers/${peerId}/dream`, body);
 }
 
+// Peer Context (Card + Representation combined)
+export async function getPeerContext(peerId: string, workspaceId = "default") {
+  return post(`/v3/workspaces/${workspaceId}/peers/${peerId}/context`, { peer_id: peerId });
+}
+
+// Session-Peers (welche Peers sind einer Session zugeordnet)
+export function getSessionPeers(sessionId: string, workspaceId = "default") {
+  return post(`/v3/workspaces/${workspaceId}/sessions/${sessionId}/peers`);
+}
+
 // Queue
 export function getQueueStatus() {
   return get("/v3/queue/status");

@@ -9,6 +9,7 @@ import {
   Brain,
   Workflow,
   Settings,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const nav = [
   { label: "Peers", href: "/peers", icon: Users },
   { label: "Memory", href: "/memory", icon: Brain },
   { label: "Pipeline", href: "/pipeline", icon: Workflow },
+  { label: "AI", href: "/ai", icon: Bot },
 ];
 
 export function Sidebar() {
