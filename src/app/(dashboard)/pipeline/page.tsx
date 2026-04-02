@@ -44,6 +44,15 @@ const agents = [
       "Erstellt kurze und lange Zusammenfassungen von Konversationen.",
     role: "realtime" as const,
   },
+  {
+    slug: "embeddings",
+    name: "Embeddings",
+    icon: "🧬",
+    model: "text-embedding-3-small",
+    description:
+      "Vektorisiert Nachrichten für semantische Suche und Memory-Retrieval.",
+    role: "realtime" as const,
+  },
 ];
 
 export default async function PipelinePage() {

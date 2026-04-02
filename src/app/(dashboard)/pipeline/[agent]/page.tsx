@@ -158,6 +158,25 @@ const agentConfigs: Record<string, AgentConfig> = {
       "Lange Summary alle": "60 Messages",
     },
   },
+  embeddings: {
+    name: "Embeddings",
+    icon: "🧬",
+    role: "realtime",
+    description:
+      "Vektorisiert Nachrichten für semantische Suche und Memory-Retrieval.",
+    longDescription:
+      "Erzeugt Vektor-Embeddings für alle eingehenden Nachrichten und Conclusions. Diese Vektoren werden in LanceDB gespeichert und ermöglichen die semantische Suche (search_memory, search_messages) der anderen Pipeline-Agents. Lange Texte werden automatisch in Chunks mit 20% Überlappung aufgeteilt.",
+    provider: "OpenRouter",
+    model: "openai/text-embedding-3-small",
+    settings: {
+      "Max Embedding Tokens": 8192,
+      "Max Tokens pro Request": 300000,
+      "Max Batch Size": 2048,
+      "Chunking-Overlap": "20%",
+      "Vektor-Datenbank": "LanceDB",
+      "Encoding": "o200k_base (tiktoken)",
+    },
+  },
 };
 
 /* ── Hilfs-Komponenten ── */
