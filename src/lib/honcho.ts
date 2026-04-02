@@ -9,9 +9,40 @@ async function api(path: string, options?: RequestInit) {
     },
     cache: "no-store",
   });
+
+  const contentType = res.headers.get("content-type") ?? "";
+  const isJson = contentType.includes("application/json");
+
   if (!res.ok) {
-    throw new Error(`Honcho API ${res.status}: ${path}`);
+    let detail = "";
+
+    try {
+      if (isJson) {
+        const data = await res.json();
+        if (typeof data?.detail === "string") detail = data.detail;
+        else if (typeof data?.error === "string") detail = data.error;
+      } else {
+        detail = (await res.text()).trim();
+      }
+    } catch {
+      detail = "";
+    }
+
+    throw new Error(
+      detail
+        ? `Honcho API ${res.status}: ${detail}`
+        : `Honcho API ${res.status}: ${path}`
+    );
   }
+
+  if (res.status === 204) {
+    return null;
+  }
+
+  if (!isJson) {
+    return null;
+  }
+
   return res.json();
 }
 
@@ -84,10 +115,13 @@ export function scheduleDream(
   sessionId?: string,
   targetPeerId?: string
 ) {
-  const body: Record<string, unknown> = {};
+  const body: Record<string, unknown> = {
+    observer: peerId,
+    dream_type: "omni",
+  };
   if (sessionId) body.session_id = sessionId;
-  if (targetPeerId) body.target_peer_id = targetPeerId;
-  return post(`/v3/workspaces/${workspaceId}/peers/${peerId}/dream`, body);
+  if (targetPeerId) body.observed = targetPeerId;
+  return post(`/v3/workspaces/${workspaceId}/schedule_dream`, body);
 }
 
 // Peer Context (Card + Representation combined)
