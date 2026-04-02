@@ -117,6 +117,12 @@ function requireApiKey(req, res, next) {
   res.status(401).json({ error: 'Ungültiger API-Key' });
 }
 
+function requireAuthOrApiKey(req, res, next) {
+  if (req.headers['x-api-key'] === API_KEY) return next();
+  if (req.session && req.session.authenticated) return next();
+  res.status(401).json({ error: 'Authentifizierung erforderlich' });
+}
+
 // --- Routes ---
 
 // Login-Seite
@@ -169,7 +175,7 @@ app.get('/gallery', requireAuth, (req, res) => {
 });
 
 // --- API: Bilder abfragen ---
-app.get('/api/images', requireAuth, (req, res) => {
+app.get('/api/images', requireAuthOrApiKey, (req, res) => {
   const {
     brand, model, tags, score_min, score_max,
     sort = 'newest', page = 1, limit = 50, search
@@ -237,10 +243,7 @@ app.get('/api/images', requireAuth, (req, res) => {
 });
 
 // --- API: Einzelnes Bild (API-Key oder Session) ---
-app.get('/api/images/:id', (req, res, next) => {
-  if (req.headers['x-api-key'] === API_KEY) return next();
-  requireAuth(req, res, next);
-}, (req, res) => {
+app.get('/api/images/:id', requireAuthOrApiKey, (req, res) => {
   const image = db.prepare('SELECT * FROM images WHERE id = ?').get(req.params.id);
   if (!image) {
     return res.status(404).json({ error: 'Bild nicht gefunden' });
@@ -259,7 +262,7 @@ app.get('/api/images/:id', (req, res, next) => {
 });
 
 // --- API: Filter-Optionen ---
-app.get('/api/filters', requireAuth, (req, res) => {
+app.get('/api/filters', requireAuthOrApiKey, (req, res) => {
   const brands = db.prepare("SELECT DISTINCT brand FROM images WHERE brand != '' ORDER BY brand").all().map(r => r.brand);
   const models = db.prepare("SELECT DISTINCT model FROM images WHERE model != '' ORDER BY model").all().map(r => r.model);
   const allTags = db.prepare("SELECT tags FROM images WHERE tags != ''").all();
@@ -372,10 +375,7 @@ app.patch('/api/images/:id/hidden', requireAdmin, (req, res) => {
 });
 
 // --- API: Bild aktualisieren (API-Key oder Session) ---
-app.patch('/api/images/:id', (req, res, next) => {
-  if (req.headers['x-api-key'] === API_KEY) return next();
-  requireAdmin(req, res, next);
-}, (req, res) => {
+app.patch('/api/images/:id', requireAdmin, (req, res) => {
   const image = db.prepare('SELECT * FROM images WHERE id = ?').get(req.params.id);
   if (!image) {
     return res.status(404).json({ error: 'Bild nicht gefunden' });
@@ -447,7 +447,7 @@ app.post('/api/projects', requireApiKey, (req, res) => {
   res.status(201).json(meta);
 });
 
-app.get('/api/projects', requireAuth, (req, res) => {
+app.get('/api/projects', requireAuthOrApiKey, (req, res) => {
   const uploadsDir = path.join(__dirname, 'uploads');
   const entries = fs.readdirSync(uploadsDir, { withFileTypes: true });
 
@@ -471,7 +471,7 @@ app.get('/api/projects', requireAuth, (req, res) => {
 });
 
 // --- API: Statistiken ---
-app.get('/api/stats', requireAuth, (req, res) => {
+app.get('/api/stats', requireAuthOrApiKey, (req, res) => {
   const total = db.prepare('SELECT COUNT(*) as count FROM images').get().count;
   const avgScore = db.prepare('SELECT AVG(score) as avg FROM images WHERE score > 0').get().avg || 0;
   const brandCounts = db.prepare("SELECT brand, COUNT(*) as count FROM images WHERE brand != '' GROUP BY brand ORDER BY count DESC").all();
