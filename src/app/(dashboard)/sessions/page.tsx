@@ -62,6 +62,12 @@ export default async function SessionsPage() {
     })
   );
 
+  // Neueste Sessions zuerst (nach created_at absteigend)
+  enriched.sort((a, b) => {
+    if (!a.created_at || !b.created_at) return 0;
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
   const totalSessions = enriched.length;
   const activeSessions = enriched.filter((s) => s.is_active).length;
   const totalMessages = enriched.reduce((sum, s) => sum + s.messageCount, 0);
