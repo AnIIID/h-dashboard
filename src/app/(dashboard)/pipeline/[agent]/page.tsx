@@ -166,7 +166,7 @@ const agentConfigs: Record<string, AgentConfig> = {
       "Vektorisiert Nachrichten für semantische Suche und Memory-Retrieval.",
     longDescription:
       "Erzeugt Vektor-Embeddings für alle eingehenden Nachrichten und Conclusions. Diese Vektoren werden in LanceDB gespeichert und ermöglichen die semantische Suche (search_memory, search_messages) der anderen Pipeline-Agents. Lange Texte werden automatisch in Chunks mit 20% Überlappung aufgeteilt.",
-    provider: "OpenRouter",
+    provider: "Requesty AI Gateway",
     model: "openai/text-embedding-3-small",
     settings: {
       "Max Embedding Tokens": 8192,
