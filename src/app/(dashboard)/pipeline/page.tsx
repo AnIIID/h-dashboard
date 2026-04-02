@@ -1,31 +1,48 @@
+import Link from "next/link";
 import { getQueueStatus } from "@/lib/honcho";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 const agents = [
   {
+    slug: "deriver",
     name: "Deriver",
     icon: "🔍",
+    model: "gemini-2.5-flash-lite",
     description:
       "Extrahiert Schlussfolgerungen und Beobachtungen aus eingehenden Nachrichten.",
     role: "realtime" as const,
   },
   {
+    slug: "dialectic",
     name: "Dialectic",
     icon: "💬",
+    model: "flash-lite / claude-haiku-4-5",
     description:
       "Beantwortet natürlichsprachliche Fragen über Peers anhand des gesammelten Wissens.",
     role: "realtime" as const,
   },
   {
+    slug: "dreamer",
     name: "Dreamer",
     icon: "🌙",
+    model: "claude-sonnet-4",
     description:
       "Konsolidiert Memory im Hintergrund — dedupliziert, bereinigt und erstellt Peer-Cards.",
     role: "background" as const,
+  },
+  {
+    slug: "summary",
+    name: "Summary",
+    icon: "📝",
+    model: "gemini-2.5-flash",
+    description:
+      "Erstellt kurze und lange Zusammenfassungen von Konversationen.",
+    role: "realtime" as const,
   },
 ];
 
@@ -144,44 +161,47 @@ export default async function PipelinePage() {
       {/* Agents */}
       <div>
         <h3 className="text-lg font-semibold mb-4">Agents</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {agents.map((agent) => {
             const isActive =
               agent.role === "realtime" ? hasActivity : pending > 0;
             return (
-              <Card key={agent.name}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <span className="text-lg">{agent.icon}</span>
-                      {agent.name}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span
-                        className={`inline-block h-2 w-2 rounded-full ${
-                          isActive ? "bg-green-500 animate-pulse" : "bg-muted-foreground/30"
-                        }`}
-                      />
-                      <Badge
-                        variant={isActive ? "default" : "secondary"}
-                        className="text-[10px]"
-                      >
-                        {isActive ? "aktiv" : "inaktiv"}
-                      </Badge>
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {agent.description}
-                  </p>
-                  <p className="text-xs text-muted-foreground/60 mt-2">
-                    {agent.role === "realtime"
-                      ? "Echtzeit-Verarbeitung"
-                      : "Hintergrund-Verarbeitung"}
-                  </p>
-                </CardContent>
-              </Card>
+              <Link key={agent.slug} href={`/pipeline/${agent.slug}`} className="group">
+                <Card className="transition-colors group-hover:border-primary/40 h-full">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <span className="text-lg">{agent.icon}</span>
+                        {agent.name}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className={`inline-block h-2 w-2 rounded-full ${
+                            isActive ? "bg-green-500 animate-pulse" : "bg-muted-foreground/30"
+                          }`}
+                        />
+                        <Badge
+                          variant={isActive ? "default" : "secondary"}
+                          className="text-[10px]"
+                        >
+                          {isActive ? "aktiv" : "inaktiv"}
+                        </Badge>
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      {agent.description}
+                    </p>
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t">
+                      <p className="text-xs font-mono text-muted-foreground/70">
+                        {agent.model}
+                      </p>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             );
           })}
         </div>
